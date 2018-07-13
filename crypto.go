@@ -1,11 +1,13 @@
 package main
 
 import (
+	"crypto/md5"
 	"crypto/rand"
 	"crypto/rsa"
 	"crypto/x509"
 	"encoding/base64"
 	"encoding/pem"
+	"fmt"
 	"log"
 )
 
@@ -39,4 +41,8 @@ func encrypt(message string) string {
 	}
 
 	return base64.StdEncoding.EncodeToString(cipherText)
+}
+
+func md5hash(text string) string {
+	return fmt.Sprintf("%x", md5.Sum([]byte(text)))
 }
