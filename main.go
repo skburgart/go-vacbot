@@ -16,16 +16,19 @@ func main() {
 
 func init_api() {
 	log.Println("initializing deebot api")
-	access_token := login(email, password_hash)
+	uid, access_token := login(email, password_hash)
+	log.Printf("uid '%s'\n", uid)
+	log.Printf("access token '%s'\n", access_token)
 
-	log.Printf("access token %s\n", access_token)
+	auth_code := get_auth_code(uid, access_token)
+	log.Printf("auth code '%s'\n", auth_code)
 }
 
 var (
 	MAIN_URL = "https://eco-%s-api.ecovacs.com/v1/private/%s/%s/%s/%s/%s/%s/%s"
 )
 
-func login(email, passwordHash string) string {
+func login(email, passwordHash string) (string, string) {
 	loginMap := map[string]string{
 		"account":  encrypt(email),
 		"password": encrypt(password_hash),
@@ -39,9 +42,29 @@ func login(email, passwordHash string) string {
 	log.Println("login successful")
 
 	data := responseJson["data"].(map[string]interface{})
+	uid := data["uid"].(string)
 	accessToken := data["accessToken"].(string)
 
-	return accessToken
+	return uid, accessToken
+}
+
+func get_auth_code(uid, accessToken string) string {
+	authMap := map[string]string{
+		"uid":         uid,
+		"accessToken": accessToken,
+	}
+	responseJson := call_main_api("user/getAuthCode", authMap)
+
+	code := responseJson["code"].(string)
+	if code != "0000" {
+		log.Fatal("get auth code error")
+	}
+	log.Println("get auth code successful")
+
+	data := responseJson["data"].(map[string]interface{})
+	authCode := data["authCode"].(string)
+
+	return authCode
 }
 
 func call_main_api(endpoint string, args map[string]string) map[string]interface{} {
