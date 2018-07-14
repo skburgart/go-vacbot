@@ -17,11 +17,7 @@ func main() {
 func init_api() {
 	log.Println("initializing deebot api")
 	uid, access_token := login(email, password_hash)
-	log.Printf("uid '%s'\n", uid)
-	log.Printf("access token '%s'\n", access_token)
-
 	auth_code := get_auth_code(uid, access_token)
-	log.Printf("auth code '%s'\n", auth_code)
 }
 
 var (
@@ -98,6 +94,10 @@ func call_main_api(endpoint string, args map[string]string) map[string]interface
 	var result map[string]interface{}
 	json.Unmarshal(resp_body, &result)
 	return result
+}
+
+func call_user_api(endpoint string, args map[string]string) map[string]interface{} {
+	return nil
 }
 
 func get_main_url() string {
