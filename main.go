@@ -38,6 +38,7 @@ func LoadConfiguration(file string) Config {
 	}
 	jsonParser := json.NewDecoder(configFile)
 	jsonParser.Decode(&config)
+	config.Resource = config.DeviceId[:8]
 	return config
 }
 
