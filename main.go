@@ -41,17 +41,19 @@ func call_main_api(endpoint string, args map[string]string) {
 	}
 
 	q := req.URL.Query()
-	for k, v := range args {
-		q.Add(k, v)
+	for _, k := range sortedKeys(args) {
+		q.Add(k, args[k])
 	}
 
 	req.URL.RawQuery = q.Encode()
 
+	log.Println(req.URL.RawQuery)
+
 	resp, err := client.Do(req)
 
 	if err != nil {
-		fmt.Println("Errored when sending request to the server")
-		return
+		log.Print(err)
+		os.Exit(1)
 	}
 
 	defer resp.Body.Close()
