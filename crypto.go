@@ -47,19 +47,19 @@ func encrypt(message string) string {
 
 func meta() map[string]string {
 	return map[string]string{
-		"country":    country,
-		"lang":       lang,
-		"deviceId":   device_id,
-		"appCode":    app_code,
-		"appVersion": app_version,
-		"channel":    channel,
-		"deviceType": device_type,
+		"country":    config.Country,
+		"lang":       config.Lang,
+		"deviceId":   config.DeviceId,
+		"appCode":    config.AppCode,
+		"appVersion": config.AppVersion,
+		"channel":    config.Channel,
+		"deviceType": config.DeviceType,
 	}
 }
 
 func sign(args map[string]string) map[string]string {
 	args["authTimespan"] = fmt.Sprintf("%v", time.Now().UnixNano()/1000000)
-	args["authTimeZone"] = timezone
+	args["authTimeZone"] = config.Timezone
 
 	textToSign := CLIENT_KEY
 

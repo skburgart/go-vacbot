@@ -7,22 +7,38 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	"os"
 	"strings"
 	"time"
 
 	xmpp "github.com/mattn/go-xmpp"
 )
 
+var config Config
+
 func main() {
 	log.Println("starting go-deebot service")
-	uid, access_token := login(email, password_hash)
+	config = LoadConfiguration("vacbot.json")
+	uid, access_token := login(config.Email, config.PasswordHash)
 	authCode := get_auth_code(uid, access_token)
 	userId, userAccessToken := get_user_access_token(uid, authCode)
-	xmppPassword := fmt.Sprintf("0/%s/%s", resource, userAccessToken)
-	_, err := xmpp.NewClientNoTLS(get_xmpp_url(), fmt.Sprintf("%s@%s", userId, realm), xmppPassword, false)
+	xmppPassword := fmt.Sprintf("0/%s/%s", config.Resource, userAccessToken)
+	_, err := xmpp.NewClientNoTLS(get_xmpp_url(), fmt.Sprintf("%s@%s", userId, config.Realm), xmppPassword, false)
 	if err != nil {
 		log.Fatal(err)
 	}
+}
+
+func LoadConfiguration(file string) Config {
+	var config Config
+	configFile, err := os.Open(file)
+	defer configFile.Close()
+	if err != nil {
+		fmt.Println(err.Error())
+	}
+	jsonParser := json.NewDecoder(configFile)
+	jsonParser.Decode(&config)
+	return config
 }
 
 var (
@@ -33,8 +49,8 @@ var (
 
 func login(email, passwordHash string) (string, string) {
 	loginMap := map[string]string{
-		"account":  encrypt(email),
-		"password": encrypt(password_hash),
+		"account":  encrypt(config.Email),
+		"password": encrypt(config.PasswordHash),
 	}
 	responseJson := call_main_api("user/login", loginMap)
 
@@ -126,9 +142,9 @@ func call_user_api(function string, args map[string]string) map[string]interface
 
 func call_login_by_it_token(uid, auth_code string) map[string]interface{} {
 	args := map[string]string{
-		"country":  strings.ToUpper(country),
-		"resource": resource,
-		"realm":    realm,
+		"country":  strings.ToUpper(config.Country),
+		"resource": config.Resource,
+		"realm":    config.Realm,
 		"userId":   uid,
 		"token":    auth_code,
 	}
@@ -152,12 +168,12 @@ func get_user_access_token(uid, authCode string) (string, string) {
 }
 
 func get_main_url() string {
-	return fmt.Sprintf(MAIN_URL, country, country, lang, device_id, app_code, app_version, channel, device_type)
+	return fmt.Sprintf(MAIN_URL, config.Country, config.Country, config.Lang, config.DeviceId, config.AppCode, config.AppVersion, config.Channel, config.DeviceType)
 }
 
 func get_user_url() string {
-	return fmt.Sprintf(USER_URL, continent)
+	return fmt.Sprintf(USER_URL, config.Continent)
 }
 func get_xmpp_url() string {
-	return fmt.Sprintf(XMPP_URL, continent)
+	return fmt.Sprintf(XMPP_URL, config.Continent)
 }
