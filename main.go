@@ -2,7 +2,10 @@ package main
 
 import (
 	"fmt"
+	"io/ioutil"
 	"log"
+	"net/http"
+	"os"
 	"time"
 )
 
@@ -27,6 +30,34 @@ var (
 func call_main_api(endpoint string, args map[string]string) {
 	args["requestId"] = md5hash(time.Now().String())
 	sign(args)
+
+	client := &http.Client{}
+
+	url := fmt.Sprintf("%s/%s", get_main_url(), endpoint)
+	req, err := http.NewRequest("GET", url, nil)
+	if err != nil {
+		log.Print(err)
+		os.Exit(1)
+	}
+
+	q := req.URL.Query()
+	for k, v := range args {
+		q.Add(k, v)
+	}
+
+	req.URL.RawQuery = q.Encode()
+
+	resp, err := client.Do(req)
+
+	if err != nil {
+		fmt.Println("Errored when sending request to the server")
+		return
+	}
+
+	defer resp.Body.Close()
+	resp_body, _ := ioutil.ReadAll(resp.Body)
+
+	log.Printf(string(resp_body))
 }
 
 func get_main_url() string {
