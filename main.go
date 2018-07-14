@@ -9,24 +9,26 @@ import (
 	"net/http"
 	"strings"
 	"time"
+
+	xmpp "github.com/mattn/go-xmpp"
 )
 
 func main() {
 	log.Println("starting go-deebot service")
-	init_api()
-}
-
-func init_api() {
-	log.Println("initializing deebot api")
 	uid, access_token := login(email, password_hash)
 	authCode := get_auth_code(uid, access_token)
 	userId, userAccessToken := get_user_access_token(uid, authCode)
-	log.Printf("userId '%s' userAccessToken '%s'\n", userId, userAccessToken)
+	xmppPassword := fmt.Sprintf("0/%s/%s", resource, userAccessToken)
+	_, err := xmpp.NewClientNoTLS(get_xmpp_url(), fmt.Sprintf("%s@%s", userId, realm), xmppPassword, false)
+	if err != nil {
+		log.Fatal(err)
+	}
 }
 
 var (
 	MAIN_URL = "https://eco-%s-api.ecovacs.com/v1/private/%s/%s/%s/%s/%s/%s/%s"
 	USER_URL = "https://users-%s.ecouser.net:8000/user.do"
+	XMPP_URL = "msg-%s.ecouser.net:5223"
 )
 
 func login(email, passwordHash string) (string, string) {
@@ -155,4 +157,7 @@ func get_main_url() string {
 
 func get_user_url() string {
 	return fmt.Sprintf(USER_URL, continent)
+}
+func get_xmpp_url() string {
+	return fmt.Sprintf(XMPP_URL, continent)
 }
