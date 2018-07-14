@@ -20,6 +20,8 @@ type VacBot struct {
 }
 
 func New(configFile string) *VacBot {
+	v := &VacBot{}
+
 	config = LoadConfiguration(configFile)
 	uid, access_token := login(config.Email, config.PasswordHash)
 	authCode := get_auth_code(uid, access_token)
@@ -30,7 +32,7 @@ func New(configFile string) *VacBot {
 		log.Fatal(err)
 	}
 
-	return &VacBot{}
+	return v
 }
 
 func LoadConfiguration(file string) Config {
