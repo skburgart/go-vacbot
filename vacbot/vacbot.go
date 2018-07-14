@@ -19,8 +19,8 @@ var config Config
 type VacBot struct {
 }
 
-func New() *VacBot {
-	config = LoadConfiguration("vacbot.json")
+func New(configFile string) *VacBot {
+	config = LoadConfiguration(configFile)
 	uid, access_token := login(config.Email, config.PasswordHash)
 	authCode := get_auth_code(uid, access_token)
 	userId, userAccessToken := get_user_access_token(uid, authCode)
@@ -38,7 +38,7 @@ func LoadConfiguration(file string) Config {
 	configFile, err := os.Open(file)
 	defer configFile.Close()
 	if err != nil {
-		fmt.Println(err.Error())
+		log.Fatal(err)
 	}
 	jsonParser := json.NewDecoder(configFile)
 	jsonParser.Decode(&config)
