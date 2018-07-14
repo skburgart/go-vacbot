@@ -47,8 +47,6 @@ func call_main_api(endpoint string, args map[string]string) {
 
 	req.URL.RawQuery = q.Encode()
 
-	log.Println(req.URL.RawQuery)
-
 	resp, err := client.Do(req)
 
 	if err != nil {

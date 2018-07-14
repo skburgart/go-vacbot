@@ -59,8 +59,7 @@ func meta() map[string]string {
 
 func sign(args map[string]string) map[string]string {
 	args["authTimespan"] = fmt.Sprintf("%v", time.Now().UnixNano()/1000000)
-	args["authTimeZone"] = "GMT-8"
-	args["authAppkey"] = CLIENT_KEY
+	args["authTimeZone"] = timezone
 
 	textToSign := CLIENT_KEY
 
@@ -71,10 +70,12 @@ func sign(args map[string]string) map[string]string {
 	}
 
 	// construct message to sign
-	for _, k := range sortedKeys(args) {
+	for _, k := range sortedKeys(signMap) {
 		textToSign += fmt.Sprintf("%s=%s", k, signMap[k])
 	}
+	textToSign += SECRET
 
+	args["authAppkey"] = CLIENT_KEY
 	args["authSign"] = md5hash(textToSign)
 
 	return args
