@@ -1,4 +1,4 @@
-package main
+package vacbot
 
 import (
 	"crypto/md5"

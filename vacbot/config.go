@@ -1,4 +1,4 @@
-package main
+package vacbot
 
 type Config struct {
 	Email        string `json:"email"`
