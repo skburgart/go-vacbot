@@ -59,26 +59,6 @@ func (vx *VacbotXMPP) issueCommand(command string) {
 	}
 }
 
-func (vx *VacbotXMPP) Forward() {
-	vx.issueCommand(COMMAND_MOVE_FORWARD)
-}
-
-func (vx *VacbotXMPP) SpinLeft() {
-	vx.issueCommand(COMMAND_SPIN_LEFT)
-}
-
-func (vx *VacbotXMPP) SpinRight() {
-	vx.issueCommand(COMMAND_SPIN_RIGHT)
-}
-
-func (vx *VacbotXMPP) TurnAround() {
-	vx.issueCommand(COMMAND_TURN_AROUND)
-}
-
-func (vx *VacbotXMPP) StopMoving() {
-	vx.issueCommand(COMMAND_STOP_MOVING)
-}
-
 func get_xmpp_url() string {
 	return fmt.Sprintf(XMPP_URL, config.Continent)
 }

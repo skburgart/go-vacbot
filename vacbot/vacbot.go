@@ -10,14 +10,17 @@ import (
 	"os"
 	"strings"
 	"time"
+)
 
-	"github.com/davecgh/go-spew/spew"
+var (
+	MAIN_URL = "https://eco-%s-api.ecovacs.com/v1/private/%s/%s/%s/%s/%s/%s/%s"
+	USER_URL = "https://users-%s.ecouser.net:8000/user.do"
 )
 
 var config Config
 
-type VacBot struct {
-	vacbotXMPP *VacbotXMPP
+type Vacot struct {
+	vx *VacbotXMPP
 }
 
 func New(configFile string) *VacBot {
@@ -29,32 +32,28 @@ func New(configFile string) *VacBot {
 	vx := NewVacbotXMPP(userId, userAccessToken, deviceJID)
 
 	return &VacBot{
-		vacbotXMPP: vx,
+		vx: vx,
 	}
 }
 
-var MILLISECONDS_PER_DEGREE = 9 * time.Millisecond
-var DELAY_AFTER_COMMAND = 150 * time.Millisecond
-
-func (v *VacBot) TurnLeft(degrees int) {
-	v.vacbotXMPP.SpinLeft()
-	spew.Dump(MILLISECONDS_PER_DEGREE * time.Duration(degrees))
-	time.Sleep(MILLISECONDS_PER_DEGREE * time.Duration(degrees))
-	v.vacbotXMPP.StopMoving()
-	time.Sleep(DELAY_AFTER_COMMAND)
+func (v *Vacbot) Forward() {
+	v.vx.issueCommand(COMMAND_MOVE_FORWARD)
 }
 
-func (v *VacBot) TurnRight(degrees int) {
-	v.vacbotXMPP.SpinRight()
-	time.Sleep(MILLISECONDS_PER_DEGREE * time.Duration(degrees))
-	v.vacbotXMPP.StopMoving()
-	time.Sleep(DELAY_AFTER_COMMAND)
+func (vx *Vacbot) SpinLeft() {
+	v.vx.issueCommand(COMMAND_SPIN_LEFT)
 }
 
-func (v *VacBot) MoveForward() {
-	v.vacbotXMPP.Forward()
-	time.Sleep(2 * time.Second)
-	v.vacbotXMPP.StopMoving()
+func (vx *Vacbot) SpinRight() {
+	v.vx.issueCommand(COMMAND_SPIN_RIGHT)
+}
+
+func (vx *Vacbot) TurnAround() {
+	v.vx.issueCommand(COMMAND_TURN_AROUND)
+}
+
+func (vx *Vacbot) StopMoving() {
+	v.vx.issueCommand(COMMAND_STOP_MOVING)
 }
 
 func LoadConfiguration(file string) Config {
@@ -69,11 +68,6 @@ func LoadConfiguration(file string) Config {
 	config.Resource = config.DeviceId[:8]
 	return config
 }
-
-var (
-	MAIN_URL = "https://eco-%s-api.ecovacs.com/v1/private/%s/%s/%s/%s/%s/%s/%s"
-	USER_URL = "https://users-%s.ecouser.net:8000/user.do"
-)
 
 func login(email, passwordHash string) (string, string) {
 	loginMap := map[string]string{
