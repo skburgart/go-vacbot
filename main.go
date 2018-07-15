@@ -12,5 +12,11 @@ func main() {
 	flag.Parse()
 
 	log.Println("starting go-deebot service")
-	vacbot.New(*configFile)
+	v := vacbot.New(*configFile)
+	v.TurnLeft(90)
+	v.TurnRight(45)
+	v.TurnRight(45)
+	v.TurnRight(180)
+	v.TurnLeft(90)
+	v.TurnLeft(90)
 }

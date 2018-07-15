@@ -10,43 +10,51 @@ import (
 	"os"
 	"strings"
 	"time"
+
+	"github.com/davecgh/go-spew/spew"
 )
 
 var config Config
 
 type VacBot struct {
+	vacbotXMPP *VacbotXMPP
 }
 
 func New(configFile string) *VacBot {
-	v := &VacBot{}
-
 	config = LoadConfiguration(configFile)
 	uid, access_token := login(config.Email, config.PasswordHash)
 	authCode := get_auth_code(uid, access_token)
 	userId, userAccessToken := get_user_access_token(uid, authCode)
 	deviceJID := get_first_device_address(userId, userAccessToken)
-	vacbotXMPP := NewVacbotXMPP(userId, userAccessToken, deviceJID)
+	vx := NewVacbotXMPP(userId, userAccessToken, deviceJID)
 
-	log.Printf("Turn around")
-	vacbotXMPP.TurnAround()
-	time.Sleep(5 * time.Second)
+	return &VacBot{
+		vacbotXMPP: vx,
+	}
+}
 
-	log.Printf("Spin Left")
-	vacbotXMPP.SpinLeft()
-	time.Sleep(5 * time.Second)
+var MILLISECONDS_PER_DEGREE = 9 * time.Millisecond
+var DELAY_AFTER_COMMAND = 150 * time.Millisecond
 
-	log.Printf("Spin Right")
-	vacbotXMPP.SpinRight()
-	time.Sleep(5 * time.Second)
+func (v *VacBot) TurnLeft(degrees int) {
+	v.vacbotXMPP.SpinLeft()
+	spew.Dump(MILLISECONDS_PER_DEGREE * time.Duration(degrees))
+	time.Sleep(MILLISECONDS_PER_DEGREE * time.Duration(degrees))
+	v.vacbotXMPP.StopMoving()
+	time.Sleep(DELAY_AFTER_COMMAND)
+}
 
-	log.Printf("Forward")
-	vacbotXMPP.Forward()
-	time.Sleep(5 * time.Second)
+func (v *VacBot) TurnRight(degrees int) {
+	v.vacbotXMPP.SpinRight()
+	time.Sleep(MILLISECONDS_PER_DEGREE * time.Duration(degrees))
+	v.vacbotXMPP.StopMoving()
+	time.Sleep(DELAY_AFTER_COMMAND)
+}
 
-	log.Printf("Stop")
-	vacbotXMPP.StopMoving()
-
-	return v
+func (v *VacBot) MoveForward() {
+	v.vacbotXMPP.Forward()
+	time.Sleep(2 * time.Second)
+	v.vacbotXMPP.StopMoving()
 }
 
 func LoadConfiguration(file string) Config {
