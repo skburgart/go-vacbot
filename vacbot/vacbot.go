@@ -126,7 +126,7 @@ func call_main_api(endpoint string, args map[string]string) map[string]interface
 	return result
 }
 
-func call_user_api(function string, args map[string]string) map[string]interface{} {
+func call_user_api(function string, args map[string]interface{}) map[string]interface{} {
 	args["todo"] = function
 
 	jsonArgs, err := json.Marshal(args)
@@ -147,8 +147,36 @@ func call_user_api(function string, args map[string]string) map[string]interface
 	return result
 }
 
+func get_devices(userId, userAccessToken string) map[string]interface{} {
+	args := map[string]interface{}{
+		"userid": userId,
+		"auth": map[string]string{
+			"with":     "users",
+			"userid":   userId,
+			"realm":    config.Realm,
+			"token":    userAccessToken,
+			"resource": config.Resource,
+		},
+	}
+	return call_user_api("GetDeviceList", args)
+}
+
+func get_first_device_address(userId, userAccessToken string) string {
+	deviceJson := get_devices(userId, userAccessToken)
+	deviceList := deviceJson["devices"].([]interface{})
+	firstDevice := deviceList[0]
+	return get_device_address(firstDevice.(map[string]interface{}))
+}
+
+func get_device_address(deviceJson map[string]interface{}) string {
+	deviceId := deviceJson["did"].(string)
+	deviceClass := deviceJson["class"].(string)
+
+	return fmt.Sprintf("%s@%s.ecorobot.net/atom", deviceId, deviceClass)
+}
+
 func call_login_by_it_token(uid, auth_code string) map[string]interface{} {
-	args := map[string]string{
+	args := map[string]interface{}{
 		"country":  strings.ToUpper(config.Country),
 		"resource": config.Resource,
 		"realm":    config.Realm,
