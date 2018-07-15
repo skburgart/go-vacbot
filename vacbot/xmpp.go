@@ -32,7 +32,7 @@ func NewVacbotXMPP(userId, userAccessToken, deviceJID string) *VacbotXMPP {
 	if err != nil {
 		log.Fatal(err)
 	}
-	go Recv(xmppClient)
+	//go Recv(xmppClient)
 
 	return &VacbotXMPP{
 		client: xmppClient,
