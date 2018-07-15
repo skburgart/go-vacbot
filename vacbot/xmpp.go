@@ -52,11 +52,31 @@ func Recv(xmppClient *xmpp.Client) {
 	}
 }
 
-func (vx *VacbotXMPP) TurnAround() {
-	_, err := vx.client.RawInformationQuery(vx.from, vx.to, "1", xmpp.IQTypeSet, "com:ctl", COMMAND_TURN_AROUND)
+func (vx *VacbotXMPP) issueCommand(command string) {
+	_, err := vx.client.RawInformationQuery(vx.from, vx.to, "1", xmpp.IQTypeSet, "com:ctl", command)
 	if err != nil {
 		log.Fatal(err)
 	}
+}
+
+func (vx *VacbotXMPP) Forward() {
+	vx.issueCommand(COMMAND_MOVE_FORWARD)
+}
+
+func (vx *VacbotXMPP) SpinLeft() {
+	vx.issueCommand(COMMAND_SPIN_LEFT)
+}
+
+func (vx *VacbotXMPP) SpinRight() {
+	vx.issueCommand(COMMAND_SPIN_RIGHT)
+}
+
+func (vx *VacbotXMPP) TurnAround() {
+	vx.issueCommand(COMMAND_TURN_AROUND)
+}
+
+func (vx *VacbotXMPP) StopMoving() {
+	vx.issueCommand(COMMAND_STOP_MOVING)
 }
 
 func get_xmpp_url() string {

@@ -26,7 +26,26 @@ func New(configFile string) *VacBot {
 	userId, userAccessToken := get_user_access_token(uid, authCode)
 	deviceJID := get_first_device_address(userId, userAccessToken)
 	vacbotXMPP := NewVacbotXMPP(userId, userAccessToken, deviceJID)
+
+	log.Printf("Turn around")
 	vacbotXMPP.TurnAround()
+	time.Sleep(5 * time.Second)
+
+	log.Printf("Spin Left")
+	vacbotXMPP.SpinLeft()
+	time.Sleep(5 * time.Second)
+
+	log.Printf("Spin Right")
+	vacbotXMPP.SpinRight()
+	time.Sleep(5 * time.Second)
+
+	log.Printf("Forward")
+	vacbotXMPP.Forward()
+	time.Sleep(5 * time.Second)
+
+	log.Printf("Stop")
+	vacbotXMPP.StopMoving()
+
 	return v
 }
 
