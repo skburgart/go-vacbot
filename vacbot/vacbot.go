@@ -10,9 +10,6 @@ import (
 	"os"
 	"strings"
 	"time"
-
-	"github.com/davecgh/go-spew/spew"
-	xmpp "github.com/mattn/go-xmpp"
 )
 
 var config Config
@@ -28,44 +25,9 @@ func New(configFile string) *VacBot {
 	authCode := get_auth_code(uid, access_token)
 	userId, userAccessToken := get_user_access_token(uid, authCode)
 	deviceJID := get_first_device_address(userId, userAccessToken)
-	xmppPassword := fmt.Sprintf("0/%s/%s", config.Resource, userAccessToken)
-
-	xmppOpts := xmpp.Options{
-		Host:     get_xmpp_url(),
-		User:     fmt.Sprintf("%s@%s", userId, config.Realm),
-		Password: xmppPassword,
-		NoTLS:    true,
-		Debug:    false,
-		Session:  true,
-	}
-	xmppClient, err := xmppOpts.NewClient()
-	if err != nil {
-		log.Fatal(err)
-	}
-	go XMPPRecv(xmppClient)
-
-	_, err = xmppClient.RawInformationQuery(xmppClient.JID(), deviceJID, "90ce30db-a0c1-4991-a343-b644edfca351-5", xmpp.IQTypeSet, "com:ctl", COMMAND_TURN_AROUND)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	time.Sleep(5 * time.Second)
-	_, err = xmppClient.RawInformationQuery(xmppClient.JID(), deviceJID, "90ce30db-a0c1-4991-a343-b644edfca351-5", xmpp.IQTypeSet, "com:ctl", COMMAND_TURN_AROUND)
-	if err != nil {
-		log.Fatal(err)
-	}
+	vacbotXMPP := NewVacbotXMPP(userId, userAccessToken, deviceJID)
+	vacbotXMPP.TurnAround()
 	return v
-}
-
-func XMPPRecv(xmppClient *xmpp.Client) {
-	log.Println("starting recv")
-	for {
-		stanza, err := xmppClient.Recv()
-		if err != nil {
-			log.Fatal(err)
-		}
-		spew.Dump(stanza)
-	}
 }
 
 func LoadConfiguration(file string) Config {
@@ -84,7 +46,6 @@ func LoadConfiguration(file string) Config {
 var (
 	MAIN_URL = "https://eco-%s-api.ecovacs.com/v1/private/%s/%s/%s/%s/%s/%s/%s"
 	USER_URL = "https://users-%s.ecouser.net:8000/user.do"
-	XMPP_URL = "msg-%s.ecouser.net:5223"
 )
 
 func login(email, passwordHash string) (string, string) {
@@ -241,7 +202,4 @@ func get_main_url() string {
 
 func get_user_url() string {
 	return fmt.Sprintf(USER_URL, config.Continent)
-}
-func get_xmpp_url() string {
-	return fmt.Sprintf(XMPP_URL, config.Continent)
 }
