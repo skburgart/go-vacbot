@@ -4,7 +4,7 @@ import (
 	"flag"
 	"log"
 
-	"gitlab.delat.net/skburgart/go-deebot/vacbot"
+	"gitlab.delat.net/skburgart/go-vacbot/vacbot"
 )
 
 func main() {
