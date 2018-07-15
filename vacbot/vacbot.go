@@ -11,7 +11,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/davecgh/go-spew/spew"
+	xmpp "github.com/mattn/go-xmpp"
 )
 
 var config Config
@@ -23,19 +23,21 @@ func New(configFile string) *VacBot {
 	v := &VacBot{}
 
 	config = LoadConfiguration(configFile)
-	//	uid, access_token := login(config.Email, config.PasswordHash)
-	//	authCode := get_auth_code(uid, access_token)
-	//	userId, userAccessToken := get_user_access_token(uid, authCode)
+	uid, access_token := login(config.Email, config.PasswordHash)
+	authCode := get_auth_code(uid, access_token)
+	userId, userAccessToken := get_user_access_token(uid, authCode)
+	deviceJID := get_first_device_address(userId, userAccessToken)
+	xmppPassword := fmt.Sprintf("0/%s/%s", config.Resource, userAccessToken)
+	xmppClient, err := xmpp.NewClientNoTLS(get_xmpp_url(), fmt.Sprintf("%s@%s", userId, config.Realm), xmppPassword, true)
+	if err != nil {
+		log.Fatal(err)
+	}
+	time.Sleep(10 * time.Second)
 
-	userId := "******"
-	userAccessToken := "******"
-	spew.Dump(get_first_device_address(userId, userAccessToken))
-
-	//	xmppPassword := fmt.Sprintf("0/%s/%s", config.Resource, userAccessToken)
-	//	_, err := xmpp.NewClientNoTLS(get_xmpp_url(), fmt.Sprintf("%s@%s", userId, config.Realm), xmppPassword, true)
-	//	if err != nil {
-	//		log.Fatal(err)
-	//	}
+	_, err = xmppClient.RawInformationQuery(xmppClient.JID(), deviceJID, "90ce30db-a0c1-4991-a343-b644edfca351-5", xmpp.IQTypeSet, "com:ctl", COMMAND_TURN_AROUND)
+	if err != nil {
+		log.Fatal(err)
+	}
 
 	return v
 }
