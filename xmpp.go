@@ -1,8 +1,11 @@
 package vacbot
 
 import (
+	"encoding/xml"
+	"errors"
 	"fmt"
 	"log"
+	"strconv"
 
 	xmpp "github.com/mattn/go-xmpp"
 )
@@ -12,15 +15,16 @@ const (
 )
 
 type VacbotXMPP struct {
-	client *xmpp.Client
-	from   string
-	to     string
+	client       *xmpp.Client
+	from         string
+	to           string
+	batteryLevel int
 }
 
 func NewVacbotXMPP(userId, userAccessToken, deviceJID string) *VacbotXMPP {
 	xmppPassword := fmt.Sprintf("0/%s/%s", config.Resource, userAccessToken)
 	xmppOpts := xmpp.Options{
-		Host:     get_xmpp_url(),
+		Host:     getXmppUrl(),
 		User:     fmt.Sprintf("%s@%s", userId, config.Realm),
 		Password: xmppPassword,
 		NoTLS:    true,
@@ -31,22 +35,53 @@ func NewVacbotXMPP(userId, userAccessToken, deviceJID string) *VacbotXMPP {
 	if err != nil {
 		log.Fatal(err)
 	}
-	go Recv(xmppClient)
 
-	return &VacbotXMPP{
+	vx := &VacbotXMPP{
 		client: xmppClient,
 		from:   xmppClient.JID(),
 		to:     deviceJID,
 	}
+
+	go vx.Recv()
+
+	return vx
 }
 
-func Recv(xmppClient *xmpp.Client) {
+func (vx *VacbotXMPP) Recv() {
 	log.Println("starting recv")
 	for {
-		stanza, err := xmppClient.Recv()
+		stanza, err := vx.client.Recv()
 		if err != nil {
 			log.Fatal(err)
 		}
+		batteryLevel, err := parseBatteryLevel(stanza)
+		if err != nil {
+			continue
+		}
+
+		vx.batteryLevel = batteryLevel
+	}
+}
+
+func parseBatteryLevel(stanza interface{}) (int, error) {
+	switch t := stanza.(type) {
+	case xmpp.IQ:
+		if t.Query == nil {
+			return 0, errors.New("nil query")
+		}
+		parsedResponse := &BatteryResponse{}
+		err := xml.Unmarshal(t.Query, parsedResponse)
+		if err != nil {
+			log.Printf("failed xml unmarshal: %v\n", err)
+		}
+		batteryLevel, err := strconv.Atoi(parsedResponse.Ctl.Battery.Power)
+		if err != nil {
+			log.Printf("failed converting battery level to int unmarshal: %v\n", err)
+		}
+
+		return batteryLevel, nil
+	default:
+		return 0, errors.New("message not IQ")
 	}
 }
 
@@ -57,6 +92,6 @@ func (vx *VacbotXMPP) issueCommand(command string) {
 	}
 }
 
-func get_xmpp_url() string {
+func getXmppUrl() string {
 	return fmt.Sprintf(XMPP_URL, config.Continent)
 }

@@ -23,17 +23,30 @@ type Client struct {
 	vx *VacbotXMPP
 }
 
-func New(configFile string) *Client {
-	config = LoadConfiguration(configFile)
-	uid, access_token := login(config.Email, config.PasswordHash)
-	authCode := get_auth_code(uid, access_token)
-	userId, userAccessToken := get_user_access_token(uid, authCode)
-	deviceJID := get_first_device_address(userId, userAccessToken)
+func New(c Config) *Client {
+	config = c
+	uid, accesstoken := login(config.Email, config.PasswordHash)
+	authCode := getAuthCode(uid, accesstoken)
+	userId, userAccessToken := getUserAccessToken(uid, authCode)
+	deviceJID := getFirstDeviceAddress(userId, userAccessToken)
 	vx := NewVacbotXMPP(userId, userAccessToken, deviceJID)
 
 	return &Client{
 		vx: vx,
 	}
+}
+
+func NewFromConfigFile(configFile string) *Client {
+	config = LoadConfiguration(configFile)
+	return New(config)
+}
+
+func (c *Client) FetchBatteryLevel() {
+	c.vx.issueCommand(COMMAND_GET_BATTERY_INFO)
+}
+
+func (c *Client) GetBatteryLevel() int {
+	return c.vx.batteryLevel
 }
 
 func (c *Client) Forward() {
@@ -74,7 +87,7 @@ func login(email, passwordHash string) (string, string) {
 		"account":  encrypt(config.Email),
 		"password": encrypt(config.PasswordHash),
 	}
-	responseJson := call_main_api("user/login", loginMap)
+	responseJson := callMainApi("user/login", loginMap)
 
 	code := responseJson["code"].(string)
 	if code != "0000" {
@@ -89,12 +102,12 @@ func login(email, passwordHash string) (string, string) {
 	return uid, accessToken
 }
 
-func get_auth_code(uid, accessToken string) string {
+func getAuthCode(uid, accessToken string) string {
 	authMap := map[string]string{
 		"uid":         uid,
 		"accessToken": accessToken,
 	}
-	responseJson := call_main_api("user/getAuthCode", authMap)
+	responseJson := callMainApi("user/getAuthCode", authMap)
 
 	code := responseJson["code"].(string)
 	if code != "0000" {
@@ -108,13 +121,13 @@ func get_auth_code(uid, accessToken string) string {
 	return authCode
 }
 
-func call_main_api(endpoint string, args map[string]string) map[string]interface{} {
+func callMainApi(endpoint string, args map[string]string) map[string]interface{} {
 	args["requestId"] = md5hash(time.Now().String())
 	sign(args)
 
 	client := &http.Client{}
 
-	url := fmt.Sprintf("%s/%s", get_main_url(), endpoint)
+	url := fmt.Sprintf("%s/%s", getMainUrl(), endpoint)
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
 		log.Fatal(err)
@@ -134,14 +147,14 @@ func call_main_api(endpoint string, args map[string]string) map[string]interface
 	}
 
 	defer resp.Body.Close()
-	resp_body, _ := ioutil.ReadAll(resp.Body)
+	respBody, _ := ioutil.ReadAll(resp.Body)
 
 	var result map[string]interface{}
-	json.Unmarshal(resp_body, &result)
+	json.Unmarshal(respBody, &result)
 	return result
 }
 
-func call_user_api(function string, args map[string]interface{}) map[string]interface{} {
+func callUserApi(function string, args map[string]interface{}) map[string]interface{} {
 	args["todo"] = function
 
 	jsonArgs, err := json.Marshal(args)
@@ -149,20 +162,20 @@ func call_user_api(function string, args map[string]interface{}) map[string]inte
 		log.Fatal("error marshalling user api json")
 	}
 
-	resp, err := http.Post(get_user_url(), "application/json", bytes.NewBuffer(jsonArgs))
+	resp, err := http.Post(getUserUrl(), "application/json", bytes.NewBuffer(jsonArgs))
 	if err != nil {
 		log.Fatal(err)
 	}
 
 	defer resp.Body.Close()
-	resp_body, _ := ioutil.ReadAll(resp.Body)
+	respBody, _ := ioutil.ReadAll(resp.Body)
 
 	var result map[string]interface{}
-	json.Unmarshal(resp_body, &result)
+	json.Unmarshal(respBody, &result)
 	return result
 }
 
-func get_devices(userId, userAccessToken string) map[string]interface{} {
+func getDevices(userId, userAccessToken string) map[string]interface{} {
 	args := map[string]interface{}{
 		"userid": userId,
 		"auth": map[string]string{
@@ -173,37 +186,37 @@ func get_devices(userId, userAccessToken string) map[string]interface{} {
 			"resource": config.Resource,
 		},
 	}
-	return call_user_api("GetDeviceList", args)
+	return callUserApi("GetDeviceList", args)
 }
 
-func get_first_device_address(userId, userAccessToken string) string {
-	deviceJson := get_devices(userId, userAccessToken)
+func getFirstDeviceAddress(userId, userAccessToken string) string {
+	deviceJson := getDevices(userId, userAccessToken)
 	deviceList := deviceJson["devices"].([]interface{})
 	firstDevice := deviceList[0]
-	return get_device_address(firstDevice.(map[string]interface{}))
+	return getDeviceAddress(firstDevice.(map[string]interface{}))
 }
 
-func get_device_address(deviceJson map[string]interface{}) string {
+func getDeviceAddress(deviceJson map[string]interface{}) string {
 	deviceId := deviceJson["did"].(string)
 	deviceClass := deviceJson["class"].(string)
 
 	return fmt.Sprintf("%s@%s.ecorobot.net/atom", deviceId, deviceClass)
 }
 
-func call_login_by_it_token(uid, auth_code string) map[string]interface{} {
+func callLoginByItToken(uid, authCode string) map[string]interface{} {
 	args := map[string]interface{}{
 		"country":  strings.ToUpper(config.Country),
 		"resource": config.Resource,
 		"realm":    config.Realm,
 		"userId":   uid,
-		"token":    auth_code,
+		"token":    authCode,
 	}
 
-	return call_user_api("loginByItToken", args)
+	return callUserApi("loginByItToken", args)
 }
 
-func get_user_access_token(uid, authCode string) (string, string) {
-	responseJson := call_login_by_it_token(uid, authCode)
+func getUserAccessToken(uid, authCode string) (string, string) {
+	responseJson := callLoginByItToken(uid, authCode)
 
 	result := responseJson["result"].(string)
 	if result != "ok" {
@@ -217,10 +230,10 @@ func get_user_access_token(uid, authCode string) (string, string) {
 	return userId, userAccessToken
 }
 
-func get_main_url() string {
+func getMainUrl() string {
 	return fmt.Sprintf(MAIN_URL, config.Country, config.Country, config.Lang, config.DeviceId, config.AppCode, config.AppVersion, config.Channel, config.DeviceType)
 }
 
-func get_user_url() string {
+func getUserUrl() string {
 	return fmt.Sprintf(USER_URL, config.Continent)
 }
