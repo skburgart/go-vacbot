@@ -45,8 +45,14 @@ func encrypt(message string) string {
 	return base64.StdEncoding.EncodeToString(cipherText)
 }
 
-func meta() map[string]string {
-	return map[string]string{
+func sign(args map[string]string) map[string]string {
+	args["authTimespan"] = fmt.Sprintf("%v", time.Now().UnixNano()/1000000)
+	args["authTimeZone"] = config.Timezone
+
+	textToSign := CLIENT_KEY
+
+	// prepare signature map
+	signMap := map[string]string{
 		"country":    config.Country,
 		"lang":       config.Lang,
 		"deviceId":   config.DeviceId,
@@ -55,16 +61,6 @@ func meta() map[string]string {
 		"channel":    config.Channel,
 		"deviceType": config.DeviceType,
 	}
-}
-
-func sign(args map[string]string) map[string]string {
-	args["authTimespan"] = fmt.Sprintf("%v", time.Now().UnixNano()/1000000)
-	args["authTimeZone"] = config.Timezone
-
-	textToSign := CLIENT_KEY
-
-	// prepare signature map
-	signMap := meta()
 	for k, v := range args {
 		signMap[k] = v
 	}
