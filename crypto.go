@@ -13,7 +13,7 @@ import (
 	"time"
 )
 
-var (
+const (
 	CLIENT_KEY         = "eJUWrzRv34qFSaYk"
 	SECRET             = "Cyu5jcR4zyK6QEPn1hdIGXB5QIDAQABMA0GC"
 	ECOVACS_PUBLIC_KEY = `

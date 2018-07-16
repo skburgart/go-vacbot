@@ -12,7 +12,7 @@ import (
 	"time"
 )
 
-var (
+const (
 	MAIN_URL = "https://eco-%s-api.ecovacs.com/v1/private/%s/%s/%s/%s/%s/%s/%s"
 	USER_URL = "https://users-%s.ecouser.net:8000/user.do"
 )

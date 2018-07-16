@@ -8,7 +8,7 @@ import (
 	xmpp "github.com/mattn/go-xmpp"
 )
 
-var (
+const (
 	XMPP_URL = "msg-%s.ecouser.net:5223"
 )
 

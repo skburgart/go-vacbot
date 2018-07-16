@@ -1,6 +1,6 @@
 package vacbot
 
-var (
+const (
 	COMMAND_MOVE_FORWARD = `<ctl td="Move"><move action="forward" /></ctl>`
 	COMMAND_SPIN_LEFT    = `<ctl td="Move"><move action="SpinLeft" /></ctl>`
 	COMMAND_SPIN_RIGHT   = `<ctl td="Move"><move action="SpinRight" /></ctl>`
