@@ -19,11 +19,11 @@ var (
 
 var config Config
 
-type Vacot struct {
+type Vacbot struct {
 	vx *VacbotXMPP
 }
 
-func New(configFile string) *VacBot {
+func New(configFile string) *Vacbot {
 	config = LoadConfiguration(configFile)
 	uid, access_token := login(config.Email, config.PasswordHash)
 	authCode := get_auth_code(uid, access_token)
@@ -31,7 +31,7 @@ func New(configFile string) *VacBot {
 	deviceJID := get_first_device_address(userId, userAccessToken)
 	vx := NewVacbotXMPP(userId, userAccessToken, deviceJID)
 
-	return &VacBot{
+	return &Vacbot{
 		vx: vx,
 	}
 }
@@ -40,19 +40,19 @@ func (v *Vacbot) Forward() {
 	v.vx.issueCommand(COMMAND_MOVE_FORWARD)
 }
 
-func (vx *Vacbot) SpinLeft() {
+func (v *Vacbot) SpinLeft() {
 	v.vx.issueCommand(COMMAND_SPIN_LEFT)
 }
 
-func (vx *Vacbot) SpinRight() {
+func (v *Vacbot) SpinRight() {
 	v.vx.issueCommand(COMMAND_SPIN_RIGHT)
 }
 
-func (vx *Vacbot) TurnAround() {
+func (v *Vacbot) TurnAround() {
 	v.vx.issueCommand(COMMAND_TURN_AROUND)
 }
 
-func (vx *Vacbot) StopMoving() {
+func (v *Vacbot) StopMoving() {
 	v.vx.issueCommand(COMMAND_STOP_MOVING)
 }
 
