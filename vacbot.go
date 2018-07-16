@@ -19,11 +19,11 @@ var (
 
 var config Config
 
-type Vacbot struct {
+type Client struct {
 	vx *VacbotXMPP
 }
 
-func New(configFile string) *Vacbot {
+func New(configFile string) *Client {
 	config = LoadConfiguration(configFile)
 	uid, access_token := login(config.Email, config.PasswordHash)
 	authCode := get_auth_code(uid, access_token)
@@ -31,29 +31,29 @@ func New(configFile string) *Vacbot {
 	deviceJID := get_first_device_address(userId, userAccessToken)
 	vx := NewVacbotXMPP(userId, userAccessToken, deviceJID)
 
-	return &Vacbot{
+	return &Client{
 		vx: vx,
 	}
 }
 
-func (v *Vacbot) Forward() {
-	v.vx.issueCommand(COMMAND_MOVE_FORWARD)
+func (c *Client) Forward() {
+	c.vx.issueCommand(COMMAND_MOVE_FORWARD)
 }
 
-func (v *Vacbot) SpinLeft() {
-	v.vx.issueCommand(COMMAND_SPIN_LEFT)
+func (c *Client) SpinLeft() {
+	c.vx.issueCommand(COMMAND_SPIN_LEFT)
 }
 
-func (v *Vacbot) SpinRight() {
-	v.vx.issueCommand(COMMAND_SPIN_RIGHT)
+func (c *Client) SpinRight() {
+	c.vx.issueCommand(COMMAND_SPIN_RIGHT)
 }
 
-func (v *Vacbot) TurnAround() {
-	v.vx.issueCommand(COMMAND_TURN_AROUND)
+func (c *Client) TurnAround() {
+	c.vx.issueCommand(COMMAND_TURN_AROUND)
 }
 
-func (v *Vacbot) StopMoving() {
-	v.vx.issueCommand(COMMAND_STOP_MOVING)
+func (c *Client) StopMoving() {
+	c.vx.issueCommand(COMMAND_STOP_MOVING)
 }
 
 func LoadConfiguration(file string) Config {
