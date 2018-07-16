@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"log"
 
-	"github.com/davecgh/go-spew/spew"
 	xmpp "github.com/mattn/go-xmpp"
 )
 
@@ -32,7 +31,7 @@ func NewVacbotXMPP(userId, userAccessToken, deviceJID string) *VacbotXMPP {
 	if err != nil {
 		log.Fatal(err)
 	}
-	//go Recv(xmppClient)
+	go Recv(xmppClient)
 
 	return &VacbotXMPP{
 		client: xmppClient,
@@ -48,7 +47,6 @@ func Recv(xmppClient *xmpp.Client) {
 		if err != nil {
 			log.Fatal(err)
 		}
-		spew.Dump(stanza)
 	}
 }
 
