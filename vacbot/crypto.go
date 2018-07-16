@@ -90,16 +90,6 @@ func sortedKeys(m map[string]string) []string {
 	return keys
 }
 
-//    sign_on = self.meta.copy()
-//    sign_on.update(result)
-//    sign_on_text = EcoVacsAPI.CLIENT_KEY + ''.join(
-//        [k + '=' + str(sign_on[k]) for k in sorted(sign_on.keys())]) + EcoVacsAPI.SECRET
-//
-//    result['authAppkey'] = EcoVacsAPI.CLIENT_KEY
-//    result['authSign'] = self.md5(sign_on_text)
-//    print("result after: ", result)
-//    return result
-
 func md5hash(text string) string {
 	return fmt.Sprintf("%x", md5.Sum([]byte(text)))
 }
