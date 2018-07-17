@@ -3,6 +3,7 @@ package vacbot
 import (
 	"fmt"
 	"log"
+	"time"
 
 	xmpp "github.com/mattn/go-xmpp"
 )
@@ -32,15 +33,32 @@ func NewVacbotXMPP(userId, userAccessToken, deviceJID string) *VacbotXMPP {
 		log.Fatal(err)
 	}
 
-	return &VacbotXMPP{
+	vx := &VacbotXMPP{
 		client: xmppClient,
 		from:   xmppClient.JID(),
 		to:     deviceJID,
 	}
+
+	go vx.pinger()
+
+	return vx
 }
 
 func (vx *VacbotXMPP) issueCommand(command string) {
 	_, err := vx.client.RawInformationQuery(vx.from, vx.to, "1", xmpp.IQTypeSet, "com:ctl", command)
+	if err != nil {
+		log.Fatal(err)
+	}
+}
+
+func (vx *VacbotXMPP) pinger() {
+	for _ = range time.Tick(30 * time.Second) {
+		vx.ping()
+	}
+}
+
+func (vx *VacbotXMPP) ping() {
+	err := vx.client.PingC2S(vx.from, vx.to)
 	if err != nil {
 		log.Fatal(err)
 	}
