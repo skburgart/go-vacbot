@@ -45,10 +45,6 @@ func (c *Client) FetchBatteryLevel() {
 	c.vx.issueCommand(COMMAND_GET_BATTERY_INFO)
 }
 
-func (c *Client) GetBatteryLevel() int {
-	return c.vx.batteryLevel
-}
-
 func (c *Client) Forward() {
 	c.vx.issueCommand(COMMAND_MOVE_FORWARD)
 }
