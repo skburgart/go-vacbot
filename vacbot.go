@@ -36,6 +36,14 @@ func New(c Config) *Client {
 	}
 }
 
+func (c *Client) RecvHandler(handlerFunc func(interface{}, error)) {
+	go func() {
+		for {
+			handlerFunc(c.vx.client.Recv())
+		}
+	}()
+}
+
 func NewFromConfigFile(configFile string) *Client {
 	config = LoadConfiguration(configFile)
 	return New(config)

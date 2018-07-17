@@ -32,13 +32,11 @@ func NewVacbotXMPP(userId, userAccessToken, deviceJID string) *VacbotXMPP {
 		log.Fatal(err)
 	}
 
-	vx := &VacbotXMPP{
+	return &VacbotXMPP{
 		client: xmppClient,
 		from:   xmppClient.JID(),
 		to:     deviceJID,
 	}
-
-	return vx
 }
 
 func (vx *VacbotXMPP) issueCommand(command string) {
