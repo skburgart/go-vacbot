@@ -1,0 +1,14 @@
+{
+  "email": "myecovacsemail@something.com",
+  "password_hash": "md5hashofpassword",
+  "device_id": "somerandommd5hash",
+  "country": "us",
+  "continent": "na",
+  "lang": "en",
+  "app_code": "i_eco_e",
+  "app_version": "1.3.5",
+  "channel": "c_googleplay",
+  "device_type": "1",
+  "timezone": "GMT-5",
+  "realm": "ecouser.net"
+}
