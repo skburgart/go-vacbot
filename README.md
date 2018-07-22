@@ -7,14 +7,14 @@ Based off of [sucks](https://github.com/wpietri/sucks) by [William Pietri](https
 ## Quick Start
 First create a config file similar to `vacbot.example.json`.
 
-```
+```golang
 package main
 
 import (
 	"flag"
 	"time"
 
-    vacbot "github.com/skburgart/go-vacbot"
+	vacbot "github.com/skburgart/go-vacbot"
 )
 
 func main() {
