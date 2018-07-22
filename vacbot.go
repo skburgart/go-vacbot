@@ -73,6 +73,10 @@ func (c *Client) StopMoving() {
 	c.vx.issueCommand(COMMAND_STOP_MOVING)
 }
 
+func (c *Client) FetchCleanState() {
+	c.vx.issueCommand(COMMAND_GET_CLEAN_STATE)
+}
+
 func LoadConfiguration(file string) Config {
 	var config Config
 	configFile, err := os.Open(file)
