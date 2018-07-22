@@ -8,4 +8,5 @@ const (
 	COMMAND_STOP_MOVING  = `<ctl td="Move"><move action="stop" /></ctl>`
 
 	COMMAND_GET_BATTERY_INFO = `<ctl td="GetBatteryInfo" />`
+	COMMAND_GET_CLEAN_STATE  = `<ctl td="GetCleanState" />`
 )
