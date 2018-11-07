@@ -77,6 +77,10 @@ func (c *Client) CleanAuto() {
 	c.vx.issueCommand(COMMAND_CLEAN_AUTO)
 }
 
+func (c *Client) CleanBorder() {
+	c.vx.issueCommand(COMMAND_CLEAN_BORDER)
+}
+
 func (c *Client) CleanSpot() {
 	c.vx.issueCommand(COMMAND_CLEAN_SPOT)
 }
@@ -91,6 +95,10 @@ func (c *Client) CleanStop() {
 
 func (c *Client) CleanAutoStrong() {
 	c.vx.issueCommand(COMMAND_CLEAN_AUTO_STRONG)
+}
+
+func (c *Client) CleanBorderStrong() {
+	c.vx.issueCommand(COMMAND_CLEAN_BORDER_STRONG)
 }
 
 func (c *Client) CleanSpotStrong() {
