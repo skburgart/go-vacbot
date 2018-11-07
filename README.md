@@ -27,5 +27,10 @@ func main() {
 	v.Forward()
 	time.Sleep(2 * time.Second)
 	v.StopMoving()
+
+	v.CleanAuto()
+
+	time.Sleep(5 * time.Second)
+	v.CleanStop()
 }
 ```

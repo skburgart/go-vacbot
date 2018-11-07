@@ -73,6 +73,46 @@ func (c *Client) StopMoving() {
 	c.vx.issueCommand(COMMAND_STOP_MOVING)
 }
 
+func (c *Client) CleanAuto() {
+	c.vx.issueCommand(COMMAND_CLEAN_AUTO)
+}
+
+func (c *Client) CleanBorder() {
+	c.vx.issueCommand(COMMAND_CLEAN_BORDER)
+}
+
+func (c *Client) CleanSpot() {
+	c.vx.issueCommand(COMMAND_CLEAN_SPOT)
+}
+
+func (c *Client) CleanSingleroom() {
+	c.vx.issueCommand(COMMAND_CLEAN_SINGLEROOM)
+}
+
+func (c *Client) CleanStop() {
+	c.vx.issueCommand(COMMAND_CLEAN_STOP)
+}
+
+func (c *Client) CleanAutoStrong() {
+	c.vx.issueCommand(COMMAND_CLEAN_AUTO_STRONG)
+}
+
+func (c *Client) CleanBorderStrong() {
+	c.vx.issueCommand(COMMAND_CLEAN_BORDER_STRONG)
+}
+
+func (c *Client) CleanSpotStrong() {
+	c.vx.issueCommand(COMMAND_CLEAN_SPOT_STRONG)
+}
+
+func (c *Client) CleanSingleroomStrong() {
+	c.vx.issueCommand(COMMAND_CLEAN_SINGLEROOM_STRONG)
+}
+
+func (c *Client) Charge() {
+	c.vx.issueCommand(COMMAND_CHARGE)
+}
+
 func (c *Client) FetchCleanState() {
 	c.vx.issueCommand(COMMAND_GET_CLEAN_STATE)
 }
