@@ -2,7 +2,7 @@
 
 A golang library for communicating with Ecovacs Deebot robot vacuums.
 
-Based off of [sucks](https://github.com/wpietri/sucks) by [William Pietri](https://github.com/wpietri).
+Inspired by [sucks](https://github.com/wpietri/sucks) from [William Pietri](https://github.com/wpietri).
 
 ## Quick Start
 First create a config file similar to `vacbot.example.json`.
@@ -23,7 +23,13 @@ func main() {
 
 	v := vacbot.NewFromConfigFile(*vacbotConfigFile)
 	v.SpinLeft()
+	time.Sleep(2 * time.Second)
+	v.StopMoving()
+
 	v.SpinRight()
+	time.Sleep(2 * time.Second)
+	v.StopMoving()
+
 	v.Forward()
 	time.Sleep(2 * time.Second)
 	v.StopMoving()
