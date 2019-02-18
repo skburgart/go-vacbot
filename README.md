@@ -35,7 +35,6 @@ func main() {
 	v.StopMoving()
 
 	v.CleanAuto()
-
 	time.Sleep(5 * time.Second)
 	v.CleanStop()
 }
