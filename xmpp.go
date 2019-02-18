@@ -1,6 +1,7 @@
 package vacbot
 
 import (
+	"crypto/tls"
 	"fmt"
 	"log"
 	"time"
@@ -27,6 +28,9 @@ func NewVacbotXMPP(userId, userAccessToken, deviceJID string) *VacbotXMPP {
 		NoTLS:    true,
 		Debug:    false,
 		Session:  true,
+		TLSConfig: &tls.Config{
+			InsecureSkipVerify: true,
+		},
 	}
 	xmppClient, err := xmppOpts.NewClient()
 	if err != nil {
