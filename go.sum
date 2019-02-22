@@ -1,4 +1,2 @@
-github.com/mattn/go-xmpp v0.0.0-20180505113305-e543ad3fcd51 h1:s/L/Ug5JQz+PEnFW3Zxkw98i0SpyGEacNZziQwBlarI=
-github.com/mattn/go-xmpp v0.0.0-20180505113305-e543ad3fcd51/go.mod h1:Cs5mF0OsrRRmhkyOod//ldNPOwJsrBvJ+1WRspv0xoc=
 github.com/mattn/go-xmpp v0.0.0-20190124093244-6093f50721ed h1:A1hEQg5M0b3Wg06pm3q/B0wdZsPjVQ/a2IgauQ8wCZo=
 github.com/mattn/go-xmpp v0.0.0-20190124093244-6093f50721ed/go.mod h1:Cs5mF0OsrRRmhkyOod//ldNPOwJsrBvJ+1WRspv0xoc=
